@@ -88,13 +88,30 @@ class FileParser:
             return "Error: Whisper not installed. Install with: pip install openai-whisper"
 
         try:
+            # Validate file exists and has content
+            file_path_obj = Path(file_path)
+            if not file_path_obj.exists():
+                return "Error: Audio file not found"
+
+            if file_path_obj.stat().st_size == 0:
+                return "Error: Audio file is empty"
+
             print(f"Transcribing audio: {file_path}")
-            model = whisper.load_model("base")
-            result = model.transcribe(file_path)
+
+            try:
+                model = whisper.load_model("base")
+            except Exception as e:
+                return f"Error: Failed to load Whisper model: {str(e)}"
+
+            try:
+                result = model.transcribe(file_path)
+            except Exception as e:
+                return f"Error: Transcription failed (ensure file is valid audio): {str(e)}"
+
             text = result.get("text", "").strip()
 
             if not text:
-                return "Error: Could not transcribe audio file"
+                return "Error: No speech detected in audio file"
 
             # Limit content length
             max_content = 3000  # ~750 words
@@ -104,7 +121,7 @@ class FileParser:
             return text
 
         except Exception as e:
-            return f"Error transcribing audio: {str(e)}"
+            return f"Error: Unexpected error processing audio: {str(e)}"
 
 
 def cleanup_files(uploads_dir: str, max_age_hours: int = 24):

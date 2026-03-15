@@ -87,6 +87,14 @@ async def generate_email(
 
             # Parse file
             file_summaries, file_type = FileParser.parse_file(str(temp_path))
+
+            # Check if file parsing failed
+            if file_summaries.startswith("Error:"):
+                raise HTTPException(
+                    status_code=400,
+                    detail=file_summaries
+                )
+
             file_info = {
                 "filename": file.filename,
                 "type": file_type,
@@ -97,6 +105,8 @@ async def generate_email(
             if temp_path.exists():
                 temp_path.unlink()
 
+        except HTTPException:
+            raise
         except Exception as e:
             raise HTTPException(
                 status_code=500,
