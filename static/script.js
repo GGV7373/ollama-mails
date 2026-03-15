@@ -59,7 +59,6 @@ fileUploadArea.addEventListener('drop', (e) => {
     const files = e.dataTransfer.files;
     if (files.length > 0) {
         selectedFile = files[0];
-        fileInput.files = e.dataTransfer.files;
         updateFileInfo();
     }
 });
@@ -79,8 +78,8 @@ function updateFileInfo() {
     if (selectedFile) {
         const fileSize = (selectedFile.size / 1024).toFixed(2);
         fileInfo.innerHTML = `
-            📎 <strong>${selectedFile.name}</strong> (${fileSize} KB)
-            <span style="margin-left: auto; cursor: pointer; color: #999;" onclick="clearFile()">✕</span>
+            <strong>${selectedFile.name}</strong> (${fileSize} KB)
+            <span style="margin-left: auto; cursor: pointer; color: #999;" onclick="clearFile()">x</span>
         `;
         fileInfo.classList.remove('hidden');
     }
@@ -102,18 +101,18 @@ async function checkOllamaStatus() {
         const data = await response.json();
 
         if (data.available) {
-            ollamaStatus.textContent = `✓ Ollama Connected (${data.models.join(', ')})`;
+            ollamaStatus.textContent = `[OK] Ollama Connected (${data.models.join(', ')})`;
             ollamaStatus.classList.add('connected');
             ollamaStatus.classList.remove('disconnected');
             generateBtn.disabled = false;
         } else {
-            ollamaStatus.textContent = '✗ Ollama Disconnected';
+            ollamaStatus.textContent = '[OFFLINE] Ollama Disconnected';
             ollamaStatus.classList.add('disconnected');
             ollamaStatus.classList.remove('connected');
             generateBtn.disabled = true;
         }
     } catch (error) {
-        ollamaStatus.textContent = '✗ Ollama Unavailable';
+        ollamaStatus.textContent = '[ERROR] Ollama Unavailable';
         ollamaStatus.classList.add('disconnected');
         ollamaStatus.classList.remove('connected');
         generateBtn.disabled = true;
@@ -200,7 +199,7 @@ async function copyToClipboard() {
     try {
         await navigator.clipboard.writeText(text);
         const originalText = copyBtn.textContent;
-        copyBtn.textContent = '✓ Copied!';
+        copyBtn.textContent = '[Copied]';
         setTimeout(() => {
             copyBtn.textContent = originalText;
         }, 2000);

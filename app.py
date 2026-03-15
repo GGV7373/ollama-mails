@@ -1,10 +1,8 @@
 import os
-import shutil
 from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
-import json
 from ollama_client import OllamaClient
 from file_parser import FileParser, cleanup_files
 
@@ -178,11 +176,11 @@ async def startup_event():
     # Check Ollama connection
     is_available = ollama_client.check_connection()
     if not is_available:
-        print("⚠️  WARNING: Ollama is not running!")
+        print("WARNING: Ollama is not running!")
         print("Please start Ollama with: ollama serve")
     else:
         models = ollama_client.list_available_models()
-        print(f"✓ Ollama is running with models: {', '.join(models)}")
+        print(f"Ollama is running with models: {', '.join(models)}")
 
 
 @app.on_event("shutdown")
