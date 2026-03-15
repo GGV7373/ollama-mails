@@ -1,126 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Email Writer - Powered by Ollama</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>AI Email Writer</h1>
-            <p>Generate professional emails using local AI</p>
-            <div id="ollama-status" class="status-indicator"></div>
-        </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AI Email Writer - Powered by Ollama</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    
+    <body>
+        <div class="container">
+            <header class="header">
+                <h1>AI Email Writer</h1>
+                <p>Generate professional emails using local AI</p>
+                <div id="ollama-status" class="status-indicator"></div>
+            </header>
 
-        <main class="content">
-            <!-- Left Panel: Input -->
-            <div class="left-panel">
-                <form id="email-form" enctype="multipart/form-data">
-                    <!-- Email Context -->
-                    <div class="form-group">
-                        <label for="context">Email Context</label>
-                        <textarea
-                            id="context"
-                            name="context"
-                            placeholder="Describe what the email should be about. Include key points, recipient information, or any special requests..."
-                            required
-                        ></textarea>
-                        <small>Be specific for better results</small>
-                    </div>
+            <main class="content">
+                <!-- Left Panel: Input -->
+                <div class="left-panel">
+                    <form id="email-form" enctype="multipart/form-data">
+                        <!-- Email Context -->
+                        <div class="form-group">
+                            <label for="context">Email Context</label>
+                            <textarea
+                                id="context"
+                                name="context"
+                                placeholder="Describe what the email should be about. Include key points, recipient information, or any special requests..."
+                                required
+                            ></textarea>
+                            <small>Be specific for better results</small>
+                        </div>
 
-                    <!-- Email Style Selection -->
-                    <div class="form-group">
-                        <label for="email-style">Email Style</label>
-                        <select id="email-style" name="email_style">
-                            <option value="professional">Professional</option>
-                            <option value="casual">Casual</option>
-                            <option value="short reply">Short Reply</option>
-                            <option value="business">Business</option>
-                        </select>
-                    </div>
+                        <!-- Email Style Selection -->
+                        <div class="form-group">
+                            <label for="email-style">Email Style</label>
+                            <select id="email-style" name="email_style">
+                                <option value="professional">Professional</option>
+                                <option value="casual">Casual</option>
+                                <option value="short reply">Short Reply</option>
+                                <option value="business">Business</option>
+                            </select>
+                        </div>
 
-                    <!-- File Upload -->
-                    <div class="form-group">
-                        <label for="file-input">Upload File (Optional)</label>
-                        <div class="file-upload-area" id="file-upload-area">
-                            <input
-                                type="file"
-                                id="file-input"
-                                name="file"
-                                accept=".pdf,.mp3,.wav,.m4a,.ogg"
-                            >
-                            <div class="upload-placeholder">
-                                <p>Click to upload or drag & drop</p>
-                                <small>PDF, MP3, WAV, M4A, OGG (max 50MB)</small>
+                        <!-- Model Selection -->
+                        <div class="form-group">
+                            <label for="model-select">Ollama Model</label>
+                            <select id="model-select" name="model">
+                                <option value="">Loading models...</option>
+                            </select>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="form-group">
+                            <label for="file-input">Upload File (Optional)</label>
+                            <div class="file-upload-area" id="file-upload-area">
+                                <input
+                                    type="file"
+                                    id="file-input"
+                                    name="file"
+                                    accept=".pdf,.mp3,.wav,.m4a,.ogg"
+                                >
+                                <div class="upload-placeholder">
+                                    <p>Click to upload or drag & drop</p>
+                                    <small>PDF, MP3, WAV, M4A, OGG (max 50MB)</small>
+                                </div>
+                            </div>
+                            <div id="file-info" class="file-info hidden"></div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button type="submit" class="btn btn-primary" id="generate-btn">
+                            Generate Email
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Panel: Output -->
+                <div class="right-panel">
+                    <div class="output-section">
+                        <div class="output-header">
+                            <h2>Generated Email</h2>
+                            <div class="output-actions">
+                                <button id="copy-btn" class="btn btn-secondary btn-small" title="Copy to clipboard">
+                                    Copy
+                                </button>
+                                <button id="download-btn" class="btn btn-secondary btn-small" title="Download as text file">
+                                    Download
+                                </button>
+                                <button id="clear-btn" class="btn btn-secondary btn-small" title="Clear output">
+                                    Clear
+                                </button>
                             </div>
                         </div>
-                        <div id="file-info" class="file-info hidden"></div>
-                    </div>
 
-                    <!-- Generate Button -->
-                    <button type="submit" class="btn btn-primary" id="generate-btn">
-                        Generate Email
-                    </button>
-                </form>
-            </div>
+                        <div id="output-area" class="output-area">
+                            <p class="placeholder">Generated email will appear here...</p>
+                        </div>
 
-            <!-- Right Panel: Output -->
-            <div class="right-panel">
-                <div class="output-section">
-                    <div class="output-header">
-                        <h2>Generated Email</h2>
-                        <div class="output-actions">
-                            <button id="copy-btn" class="btn btn-secondary btn-small" title="Copy to clipboard">
-                                Copy
-                            </button>
-                            <button id="download-btn" class="btn btn-secondary btn-small" title="Download as text file">
-                                Download
-                            </button>
-                            <button id="clear-btn" class="btn btn-secondary btn-small" title="Clear output">
-                                Clear
-                            </button>
+                        <!-- Stats -->
+                        <div id="email-stats" class="email-stats hidden">
+                            <span id="word-count">Words: 0</span>
+                            <span id="char-count">Characters: 0</span>
                         </div>
                     </div>
 
-                    <div id="output-area" class="output-area">
-                        <p class="placeholder">Generated email will appear here...</p>
+                    <!-- Loading Spinner -->
+                    <div id="loading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p>Generating email...</p>
                     </div>
 
-                    <!-- Stats -->
-                    <div id="email-stats" class="email-stats hidden">
-                        <span id="word-count">Words: 0</span>
-                        <span id="char-count">Characters: 0</span>
-                    </div>
+                    <!-- Error Message -->
+                    <div id="error-message" class="error hidden"></div>
                 </div>
+            </main>
 
-                <!-- Loading Spinner -->
-                <div id="loading" class="loading hidden">
-                    <div class="spinner"></div>
-                    <p>Generating email...</p>
-                </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <p>Powered by Ollama • Running locally on your machine</p>
+                <details>
+                    <summary style="cursor: pointer; color: #666;">Tips</summary>
+                    <ul style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                        <li>Use clear, detailed context for best results</li>
+                        <li>Upload PDFs or audio files to provide additional context</li>
+                        <li>Requires Ollama running locally (check status indicator above)</li>
+                        <li>Supports Llama 3, Mistral, and other Ollama models</li>
+                    </ul>
+                </details>
+            </footer>
+        </div>
 
-                <!-- Error Message -->
-                <div id="error-message" class="error hidden"></div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Powered by Ollama • Running locally on your machine</p>
-            <details>
-                <summary style="cursor: pointer; color: #666;">Tips</summary>
-                <ul style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                    <li>Use clear, detailed context for best results</li>
-                    <li>Upload PDFs or audio files to provide additional context</li>
-                    <li>Requires Ollama running locally (check status indicator above)</li>
-                    <li>Supports Llama 3, Mistral, and other Ollama models</li>
-                </ul>
-            </details>
-        </footer>
-    </div>
-
-    <script src="/static/script.js"></script>
-</body>
+        <script src="/static/script.js"></script>
+    </body>
 </html>

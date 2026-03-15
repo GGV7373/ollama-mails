@@ -42,6 +42,7 @@ async def serve_index():
 async def generate_email(
     context: str = Form(...),
     email_style: str = Form(default="professional"),
+    model: str = Form(default=""),
     file: UploadFile = File(None)
 ):
     """
@@ -50,6 +51,7 @@ async def generate_email(
     Args:
         context: User-provided context for the email
         email_style: Style of the email
+        model: Ollama model to use (optional)
         file: Optional file for additional context
 
     Returns:
@@ -108,11 +110,21 @@ async def generate_email(
             detail="Ollama is not running. Please start Ollama first (ollama serve)"
         )
 
-    # Generate email
+    # Validate model if provided
+    if model:
+        available_models = ollama_client.list_available_models()
+        if model not in available_models:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Model '{model}' not available. Available models: {', '.join(available_models)}"
+            )
+
+    # Generate email with specified model
     generated_email = ollama_client.generate_email(
         context=context,
         email_style=email_style,
         file_summaries=file_summaries,
+        model=model,
         temperature=0.7
     )
 

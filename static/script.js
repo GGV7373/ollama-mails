@@ -2,6 +2,7 @@
 const emailForm = document.getElementById('email-form');
 const contextInput = document.getElementById('context');
 const emailStyleSelect = document.getElementById('email-style');
+const modelSelect = document.getElementById('model-select');
 const fileInput = document.getElementById('file-input');
 const fileUploadArea = document.getElementById('file-upload-area');
 const fileInfo = document.getElementById('file-info');
@@ -18,6 +19,7 @@ const wordCountSpan = document.getElementById('word-count');
 const charCountSpan = document.getElementById('char-count');
 
 let selectedFile = null;
+let cachedModels = null;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -105,6 +107,13 @@ async function checkOllamaStatus() {
             ollamaStatus.classList.add('connected');
             ollamaStatus.classList.remove('disconnected');
             generateBtn.disabled = false;
+
+            // Only rebuild if models changed
+            const modelsString = JSON.stringify(data.models);
+            if (modelsString !== cachedModels) {
+                cachedModels = modelsString;
+                populateModelSelect(data.models, data.default_model);
+            }
         } else {
             ollamaStatus.textContent = '[OFFLINE] Ollama Disconnected';
             ollamaStatus.classList.add('disconnected');
@@ -119,15 +128,37 @@ async function checkOllamaStatus() {
     }
 }
 
+// Populate model selector dropdown
+function populateModelSelect(models, defaultModel) {
+    if (models.length === 0) {
+        modelSelect.innerHTML = '<option value="">No models available</option>';
+        return;
+    }
+
+    // Build HTML string for better performance
+    let html = '';
+    models.forEach(model => {
+        const selected = model === defaultModel ? ' selected' : '';
+        html += `<option value="${escapeHtml(model)}"${selected}>${escapeHtml(model)}</option>`;
+    });
+    modelSelect.innerHTML = html;
+}
+
 // Handle email generation
 async function handleEmailGeneration(e) {
     e.preventDefault();
 
     const context = contextInput.value.trim();
     const emailStyle = emailStyleSelect.value;
+    const model = modelSelect.value;
 
     if (!context) {
         showError('Please provide email context');
+        return;
+    }
+
+    if (!model) {
+        showError('Please select an Ollama model');
         return;
     }
 
@@ -138,6 +169,7 @@ async function handleEmailGeneration(e) {
         const formData = new FormData();
         formData.append('context', context);
         formData.append('email_style', emailStyle);
+        formData.append('model', model);
 
         if (selectedFile) {
             formData.append('file', selectedFile);

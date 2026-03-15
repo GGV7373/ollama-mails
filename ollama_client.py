@@ -16,6 +16,7 @@ class OllamaClient:
         context: str,
         email_style: str = "professional",
         file_summaries: str = "",
+        model: str = "",
         temperature: float = 0.7
     ) -> str:
         """
@@ -25,20 +26,24 @@ class OllamaClient:
             context: User-provided context for the email
             email_style: Style of the email (professional, casual, short reply, business)
             file_summaries: Extracted text from uploaded files
+            model: Model to use (defaults to self.model if not provided)
             temperature: Model temperature for creativity (0.0 to 1.0)
 
         Returns:
-            Generated email textError: 404 Client Error: Not Found for url: http://localhost:11434/api/generate
+            Generated email text
         """
 
         # Build the prompt
         prompt = self._build_prompt(context, email_style, file_summaries)
 
+        # Use provided model or default
+        active_model = model or self.model
+
         try:
             response = requests.post(
                 self.base_url,
                 json={
-                    "model": self.model,
+                    "model": active_model,
                     "prompt": prompt,
                     "stream": False,
                     "temperature": temperature
