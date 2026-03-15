@@ -5,7 +5,17 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
+    build-essential \
+    python3-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and setuptools to avoid missing 'pkg_resources' module
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install Rust for building tiktoken dependency
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && export PATH="$HOME/.cargo/bin:$PATH"
 
 # Copy requirements
 COPY requirements.txt .
