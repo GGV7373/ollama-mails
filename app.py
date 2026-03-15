@@ -17,7 +17,7 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
 
 # Initialize Ollama client
-ollama_client = OllamaClient(model="mistral")
+ollama_client = OllamaClient(model="llama3.2:latest")
 
 # Mount static files
 static_dir = Path("static")

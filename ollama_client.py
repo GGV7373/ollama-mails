@@ -28,7 +28,7 @@ class OllamaClient:
             temperature: Model temperature for creativity (0.0 to 1.0)
 
         Returns:
-            Generated email text
+            Generated email textError: 404 Client Error: Not Found for url: http://localhost:11434/api/generate
         """
 
         # Build the prompt
