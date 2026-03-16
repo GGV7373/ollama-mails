@@ -62,10 +62,10 @@ body {
 
 /* Main Content Area */
 .content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 20px;
     flex: 1;
+    align-items: stretch;
 }
 
 .left-panel, .right-panel {
@@ -73,6 +73,16 @@ body {
     border-radius: 12px;
     padding: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 0;
+}
+
+.left-panel {
+    flex: 0 0 320px;
+}
+
+.right-panel {
+    flex: 1 1 auto;
+    min-height: 680px;
 }
 
 /* Form Groups */
@@ -246,6 +256,7 @@ select:focus {
 .output-section {
     position: relative;
     height: 100%;
+    min-height: 620px;
     display: flex;
     flex-direction: column;
 }
@@ -272,6 +283,7 @@ select:focus {
 
 .output-area {
     flex: 1;
+    min-height: 0;
     padding: 20px;
     background: #f9f9f9;
     border: 1px solid #e0e0e0;
@@ -289,6 +301,14 @@ select:focus {
     color: #999;
     font-style: italic;
     margin: 0;
+}
+
+.output-area pre {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font: inherit;
 }
 
 .email-stats {
@@ -374,7 +394,7 @@ select:focus {
 /* Responsive Design */
 @media (max-width: 1024px) {
     .content {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 
     .header h1 {
@@ -382,7 +402,13 @@ select:focus {
     }
 
     .left-panel, .right-panel {
+        flex: 1 1 auto;
         padding: 20px;
+    }
+
+    .right-panel,
+    .output-section {
+        min-height: auto;
     }
 }
 
